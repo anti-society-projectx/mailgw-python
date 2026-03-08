@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from mailgw.logger import logger
 from mailgw.models.account import Account
 
 if TYPE_CHECKING:
@@ -45,5 +46,6 @@ class AccountsResource:
             f"/accounts/{account_id}",
             token=token
         )
+        logger.debug("Account %s successful delete", account_id)
 
         return True
