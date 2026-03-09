@@ -51,6 +51,16 @@ pip install "git+https://github.com/<your-user>/<your-repo>.git"
 pip install .
 ```
 
+## Client Lifecycle
+
+You can create the client directly:
+
+```python
+client = MailGWClient()
+```
+
+`async with MailGWClient()` is also supported and is usually preferred, because the client connection closes automatically.
+
 ## Quick Start
 
 ```python
@@ -61,21 +71,22 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        domains = await client.domains.get()
-        domain = domains.hydra_member[0].domain
+    client = MailGWClient()
 
-        address = f"{uuid.uuid4()}@{domain}"
-        password = str(uuid.uuid4())
+    domains = await client.domains.get()
+    domain = domains.hydra_member[0].domain
 
-        account = await client.accounts.create(address, password)
-        token_data = await client.token.get_token(address, password)
-        token = token_data.token
+    address = f"{uuid.uuid4()}@{domain}"
+    password = str(uuid.uuid4())
 
-        messages = await client.messages.reads(token)
-        print(f"Mailbox has {messages.total_items} messages")
+    account = await client.accounts.create(address, password)
+    token_data = await client.token.get_token(address, password)
+    token = token_data.token
 
-        await client.accounts.delete_by_id(account.id, token)
+    messages = await client.messages.reads(token)
+    print(f"Mailbox has {messages.total_items} messages")
+
+    await client.accounts.delete_by_id(account.id, token)
 
 
 if __name__ == "__main__":
@@ -93,10 +104,11 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        domains = await client.domains.get(page=1)
-        for item in domains.hydra_member or []:
-            print(item.domain, item.is_active)
+    client = MailGWClient()
+
+    domains = await client.domains.get(page=1)
+    for item in domains.hydra_member or []:
+        print(item.domain, item.is_active)
 
 
 if __name__ == "__main__":
@@ -112,9 +124,9 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        domain = await client.domains.get_by_id("your-domain-id")
-        print(domain)
+    client = MailGWClient()
+    domain = await client.domains.get_by_id("your-domain-id")
+    print(domain)
 
 
 if __name__ == "__main__":
@@ -131,16 +143,17 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        domains = await client.domains.get()
-        domain = domains.hydra_member[0].domain
+    client = MailGWClient()
 
-        address = f"{uuid.uuid4()}@{domain}"
-        password = str(uuid.uuid4())
+    domains = await client.domains.get()
+    domain = domains.hydra_member[0].domain
 
-        account = await client.accounts.create(address, password)
-        print("Account ID:", account.id)
-        print("Address:", account.address)
+    address = f"{uuid.uuid4()}@{domain}"
+    password = str(uuid.uuid4())
+
+    account = await client.accounts.create(address, password)
+    print("Account ID:", account.id)
+    print("Address:", account.address)
 
 
 if __name__ == "__main__":
@@ -156,12 +169,12 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        token_data = await client.token.get_token(
-            address="user@your-domain.tld",
-            password="your-password",
-        )
-        print("Token:", token_data.token)
+    client = MailGWClient()
+    token_data = await client.token.get_token(
+        address="user@your-domain.tld",
+        password="your-password",
+    )
+    print("Token:", token_data.token)
 
 
 if __name__ == "__main__":
@@ -177,9 +190,9 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        me = await client.accounts.me("your-jwt-token")
-        print(me.id, me.address)
+    client = MailGWClient()
+    me = await client.accounts.me("your-jwt-token")
+    print(me.id, me.address)
 
 
 if __name__ == "__main__":
@@ -195,11 +208,11 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        messages = await client.messages.reads("your-jwt-token")
-        print("Total:", messages.total_items)
-        for message in messages.messages:
-            print(message.id, message.subject)
+    client = MailGWClient()
+    messages = await client.messages.reads("your-jwt-token")
+    print("Total:", messages.total_items)
+    for message in messages.messages:
+        print(message.id, message.subject)
 
 
 if __name__ == "__main__":
@@ -215,13 +228,13 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        message = await client.messages.read_by_id(
-            message_id="your-message-id",
-            token="your-jwt-token",
-        )
-        print(message.subject)
-        print(message.text)
+    client = MailGWClient()
+    message = await client.messages.read_by_id(
+        message_id="your-message-id",
+        token="your-jwt-token",
+    )
+    print(message.subject)
+    print(message.text)
 
 
 if __name__ == "__main__":
@@ -237,12 +250,12 @@ from mailgw import MailGWClient
 
 
 async def main():
-    async with MailGWClient() as client:
-        source = await client.sources.get_source_message(
-            message_id="your-message-id",
-            token="your-jwt-token",
-        )
-        print(source.data)
+    client = MailGWClient()
+    source = await client.sources.get_source_message(
+        message_id="your-message-id",
+        token="your-jwt-token",
+    )
+    print(source.data)
 
 
 if __name__ == "__main__":
@@ -263,15 +276,15 @@ from mailgw import MailGWClient
 async def main():
     account_id = "your-account-id"
     token = "your-jwt-token"
+    client = MailGWClient()
 
-    async with MailGWClient() as client:
-        try:
-            async for event in client.messages.listen_messages(account_id, token):
-                full_message = await client.messages.read_by_id(event.id, token)
-                print("New message:", full_message.subject)
-                break
-        except httpx.ReadTimeout:
-            print("No new messages within timeout window")
+    try:
+        async for event in client.messages.listen_messages(account_id, token):
+            full_message = await client.messages.read_by_id(event.id, token)
+            print("New message:", full_message.subject)
+            break
+    except httpx.ReadTimeout:
+        print("No new messages within timeout window")
 
 
 if __name__ == "__main__":
@@ -293,8 +306,9 @@ async def main():
     account_id = "your-account-id"
     token = "your-jwt-token"
     webhook_url = "https://your-service.example/webhooks/mailgw"
+    client = MailGWClient()
 
-    async with MailGWClient() as client, httpx.AsyncClient(timeout=10.0) as webhook_client:
+    async with httpx.AsyncClient(timeout=10.0) as webhook_client:
         async for event in client.messages.listen_messages(account_id, token):
             message = await client.messages.read_by_id(event.id, token)
             await webhook_client.post(
@@ -348,12 +362,12 @@ from mailgw.exceptions import APIError
 
 
 async def main():
-    async with MailGWClient() as client:
-        try:
-            await client.accounts.me("invalid-token")
-        except APIError as e:
-            print(f"Status: {e.status_code}")
-            print(f"Message: {e.message}")
+    client = MailGWClient()
+    try:
+        await client.accounts.me("invalid-token")
+    except APIError as e:
+        print(f"Status: {e.status_code}")
+        print(f"Message: {e.message}")
 
 
 if __name__ == "__main__":
@@ -362,6 +376,7 @@ if __name__ == "__main__":
 
 ## Notes
 
-- Use `async with MailGWClient()` to close HTTP connections automatically.
+- You can use `client = MailGWClient()` directly.
+- `async with MailGWClient()` is usually preferred because the client connection is closed automatically.
 - You can override request timeout: `MailGWClient(timeout=5.0)`.
 - Real-time updates use Mercure Server-Sent Events (SSE).
