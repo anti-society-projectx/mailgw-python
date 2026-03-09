@@ -2,6 +2,10 @@
 name = "mailgw-python"
 version = "0.1.0"
 description = "Async Python client for the mail.gw API"
+license = "MIT"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
 authors = [
     {name = "anti-society-projectx",email = "anti-society-projectx@gmail.com"}
 ]
